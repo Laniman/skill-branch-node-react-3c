@@ -22,28 +22,44 @@ export default (app) => {
 
   app.param('type', (req, res, next, value) => {
     const pokemons = state.pokemons;
-    switch (value) {
-      case 'fat':
-        req.pokemons = _.orderBy(pokemons, [p => p.weight / p.height, 'name'], ['desc', 'asc']);
-        break;
-      case 'angular':
-        req.pokemons = _.orderBy(pokemons, [p => p.weight / p.height, 'name'], ['asc', 'asc']);
-        break;
-      case 'heavy':
-        req.pokemons = _.orderBy(pokemons, [p => Number(p.weight), 'name'], ['desc', 'asc']);
-        break;
-      case 'light':
-        req.pokemons = _.orderBy(pokemons, [p => Number(p.weight), 'name'], ['asc', 'asc']);
-        break;
-      case 'huge':
-        req.pokemons = _.orderBy(pokemons, [p => Number(p.height), 'name'], ['desc', 'asc']);
-        break;
-      case 'micro':
-        req.pokemons = _.orderBy(pokemons, [p => Number(p.height), 'name'], ['asc', 'asc']);
-        break;
-      default:
-        req.pokemons = state.pokemons;
-    }
+    // switch (value) {
+    //   case 'fat':
+    //     req.pokemons = _.orderBy(pokemons, [p => p.weight / p.height, 'name'], ['desc', 'asc']);
+    //     break;
+    //   case 'angular':
+    //     req.pokemons = _.orderBy(pokemons, [p => p.weight / p.height, 'name'], ['asc', 'asc']);
+    //     break;
+    //   case 'heavy':
+    //     req.pokemons = _.orderBy(pokemons, [p => Number(p.weight), 'name'], ['desc', 'asc']);
+    //     break;
+    //   case 'light':
+    //     req.pokemons = _.orderBy(pokemons, [p => Number(p.weight), 'name'], ['asc', 'asc']);
+    //     break;
+    //   case 'huge':
+    //     req.pokemons = _.orderBy(pokemons, [p => Number(p.height), 'name'], ['desc', 'asc']);
+    //     break;
+    //   case 'micro':
+    //     req.pokemons = _.orderBy(pokemons, [p => Number(p.height), 'name'], ['asc', 'asc']);
+    //     break;
+    //   default:
+    //     req.pokemons = state.pokemons;
+    // }
+
+    const sortPokemonsFunc = {
+      fat: p => -Number(p.weight) / Number(p.height),
+      angular: p => Number(p.weight) / Number(p.height),
+      heavy: p => -Number(p.weight),
+      light: p => Number(p.weight),
+      huge: p => -Number(p.height),
+      micro: p => Number(p.height),
+    };
+
+    const sortFunc =
+      Object.prototype.hasOwnProperty.call(sortPokemonsFunc, value) ?
+      sortPokemonsFunc[value] :
+      () => {};
+
+    req.pokemons = _.sortBy(pokemons, [sortFunc, 'name']);
     next();
   });
 
@@ -64,6 +80,6 @@ export default (app) => {
 
   app.use((err, req, res, next) => {
     log(err.message);
-    res.status(err.status).send();
+    res.sendStatus(err.status);
   });
 };
