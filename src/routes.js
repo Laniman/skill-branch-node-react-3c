@@ -13,10 +13,12 @@ const initState = () => {
 const state = initState();
 
 export default (app) => {
-  // app.use((req, res, next) => {
-  //   log('body', req.body);
-  //   next();
-  // });
+  const limitDataSelection = ((req, res, next) => {
+    const { limit = 20, offset = 0 } = req.query;
+    req.limit = Number(limit);
+    req.offset = Number(offset);
+    next();
+  });
 
   app.param('type', (req, res, next, value) => {
     const pokemons = state.pokemons;
@@ -50,12 +52,9 @@ export default (app) => {
     return result;
   };
 
-  app.get('/:type?', (req, res) => {
+  app.get('/:type?', limitDataSelection, (req, res) => {
     const pokemons = req.pokemons ? req.pokemons : state.pokemons;
-    const { offset: offsetStr, limit: limitStr } = req.query;
-    const offset = offsetStr ? Number(offsetStr) : 0;
-    const limit = limitStr ? Number(limitStr) : 20;
-    const result = useSlice(pokemons, offset, limit);
+    const result = useSlice(pokemons, req.offset, req.limit);
     res.json(result);
   });
 
