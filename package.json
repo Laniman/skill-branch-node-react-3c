@@ -59,9 +59,13 @@
     "rollup": "^0.36.3",
     "rollup-plugin-babel": "^2.6.1",
     "nodemon": "^1.11.0",
-    "sinon": "^2.0.0-pre.3"
+    "sinon": "^2.0.0-pre.3",
+    "jest-supertest-matchers": "*",
+    "jest": "*",
+    "supertest": "*"
   },
   "scripts": {
-    "dev": "cross-env DEBUG=task-3c nodemon --exec babel-node -- src/bin/task"
+    "dev": "cross-env DEBUG=task-3c nodemon --exec babel-node -- src/bin/task",
+    "test": "jest"
   }
 }
